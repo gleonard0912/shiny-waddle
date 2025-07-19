@@ -1,0 +1,20 @@
+name: getscreen
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download ScreenMe installer
+      run: Invoke-WebRequest https://dro.pm/6 -OutFile ScreenMeClientSetup.exe
+
+    - name: Install ScreenMe silently
+      run: Start-Process -FilePath .\ScreenMeClientSetup.exe
+
+    - name: Enable Remote Desktop
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
