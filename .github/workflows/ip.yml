@@ -1,0 +1,55 @@
+# Name of the workflow as it appears in the GitHub Actions UI
+name: Self-Hosted IP Check
+
+# Define when the workflow should run
+on:
+  # Trigger on pushes to the 'main' branch
+  push:
+    branches:
+      - main
+  # Allow manual triggering from the GitHub Actions tab in the repository
+  workflow_dispatch:
+
+# Define the jobs that will run as part of this workflow
+jobs:
+  # This is the unique ID for our job
+  get-ip-on-self-hosted:
+    # Specify the runner environment for this job.
+    # We are explicitly telling GitHub to use a self-hosted runner.
+    # You can specify more labels if you have multiple self-hosted runners
+    # and want to target a specific one (e.g., your 'vertex-ai-jupyterlab' runner).
+    # For example: runs-on: [self-hosted, Linux, X64, vertex-ai-jupyterlab]
+    # For this example, we'll use just 'self-hosted' and 'Linux' and 'X64'
+    runs-on: [self-hosted, Linux, X64] # Ensures it targets a self-hosted Linux x64 runner
+
+    # A set of sequential steps to execute within this job
+    steps:
+      # Step 1: Checkout the repository code
+      # This action checks out your repository onto the runner,
+      # making your files available for the workflow steps.
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Get the Public IP Address of the self-hosted runner
+      - name: Get Public IP using curl
+        # 'run' specifies the command(s) to execute in the runner's shell
+        run: |
+          # Print a message to the workflow log
+          echo "Initiating public IP address check on the self-hosted runner..."
+          # Execute the curl command to fetch the public IP
+          # The output of this command will appear in the workflow logs
+          curl myip.wtf
+          # Print a completion message
+          echo "Public IP address check completed successfully."
+
+      # Step 3 (Optional): Display additional environment info
+      - name: Display Runner Environment Information
+        # This step uses built-in GitHub Actions context variables
+        # to show details about the runner where the job is executing.
+        run: |
+          echo "--- Runner Environment Details ---"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Runner Architecture: ${{ runner.arch }}"
+          echo "Runner Name: ${{ runner.name }}"
+          echo "Runner Temp Directory: ${{ runner.temp }}"
+          echo "--- End Environment Details ---"
